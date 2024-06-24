@@ -224,7 +224,7 @@ class Sudoku:
         empty_positions = [(i, j) for i in range(3) for j in range(3) if sub_puzzle[i][j] == 0]
 
         # Generate all combinations of numbers 1-9 for the empty positions
-        all_numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        all_numbers = [num for num in range(1, 10)]
         existing_numbers = {num for row in sub_puzzle for num in row if num != 0}
         possible_numbers = [num for num in all_numbers if num not in existing_numbers]
 
@@ -262,7 +262,19 @@ class Sudoku:
         
         return False
     
+    def combine_sub_puzzles(self, sub_puzzles):
+        """Combine the 3x3 sub-puzzles into a 9x9 Sudoku puzzle."""
+        sudoku = [[0 for _ in range(9)] for _ in range(9)]
 
+        for i, sub_puzzle in enumerate(sub_puzzles):
+            row = (i // 3) * 3
+            col = (i % 3) * 3
+
+            for r in range(3):
+                for c in range(3):
+                    sudoku[row + r][col + c] = sub_puzzle[r][c]
+
+        return sudoku
 
 
 if __name__ == "__main__":

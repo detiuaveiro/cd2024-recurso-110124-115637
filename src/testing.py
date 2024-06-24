@@ -63,9 +63,9 @@ def generate_possibilities(sub_puzzle):
 
 # Exemplo de uso:
 sub_puzzle = [
-    [5, 3, 0],
-    [6, 0, 0],
-    [0, 9, 8]
+    [9, 1, 4],
+    [8, 2, 3],
+    [5, 0, 0]
 ]
 
 possibilities = generate_possibilities(sub_puzzle)
