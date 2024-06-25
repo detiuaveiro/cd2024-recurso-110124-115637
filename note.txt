@@ -1,3 +1,13 @@
+Tasks:
+    - [x] create /solve endpoint web api 
+    - [] create /solution/id endpoint
+    - [x] receber 1 puzzle
+    - [] receber 1 ou mais puzzle
+    - [x] dividir o puzzle e receber as configurações
+    - [] reduzir as soluções criando 3x9 válidos
+    - [] reduzir a solução final
+
+
 references: 
 - https://youtu.be/NAGu_oBCtwI?si=NYcQlPDFV170fR2x
 - https://youtu.be/cvhKoniK5Uo?si=6wA8mHonWGvFqmJ8
