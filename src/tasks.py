@@ -17,3 +17,27 @@ def generate_possible_puzzles(task):
     possible_puzzles = sudoku.generate_possibilities(subgrid)
     print("possible_puzzles", possible_puzzles)
     return possible_puzzles
+
+
+@app.task(name="tasks.validate_line")
+def validate_line(task):
+    """Validates a 3x9 line of a sudoku puzzle"""
+    line = task
+    sudoku = Sudoku(line)
+    
+    if sudoku.checkx9():
+        return line
+    else:
+        return False
+    
+
+@app.task(name="tasks.check_puzzle")
+def check_puzzle(task):
+    """Checks a 9x9 sudoku puzzle"""
+    puzzle = task
+    sudoku = Sudoku(puzzle)
+    
+    if sudoku.check():
+        return puzzle
+    else:
+        return False

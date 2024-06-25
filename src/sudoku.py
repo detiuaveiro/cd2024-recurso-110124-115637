@@ -1,6 +1,7 @@
 import time
 from collections import deque
 import itertools
+from pprint import pprint
 
 
 
@@ -61,6 +62,12 @@ class Sudoku:
         """Update the values of the given column."""
         for row in range(9):
             self.grid[row][col] = values[row]
+
+    def update_lines(self, lines, values):
+        """Update the values of the given square."""
+        for i in range(3):
+            value =values[0][i] + values[1][i] + values[2][i]
+            self.update_row(i + lines * 3, value)
 
     def check_is_valid(
         self, row, col, num, base_delay=None, interval=None, threshold=None
@@ -144,6 +151,24 @@ class Sudoku:
         return True
     
 
+    def checkx9(self, base_delay=None, interval=None, threshold=None):
+        """Check if the given Sudoku solution is correct.
+
+        You MUST incorporate this method without modifications into your final solution.
+        """
+        for row in range(3):
+            if not self.check_row(row, base_delay, interval, threshold):
+                return False
+
+        # Check 3x3 squares
+        for i in range(1):
+            for j in range(1):
+                if not self.check_square(i * 3, j * 3, base_delay, interval, threshold):
+                    return False
+
+        return True
+    
+
     # my function to get sudoku line
     def get_line(self, row):
         return self.grid[row]
@@ -161,11 +186,7 @@ class Sudoku:
     def get_check_count(self) -> int:
         """Returns the number of times the check() method was called."""
         return self.check_count
-    
-
-    def update_cell(self, row, col, value):
-        self.grid[row][col] = value
-    
+        
 
     def update_sudoku(self, new_sudoku):
         self.grid = new_sudoku
@@ -193,8 +214,7 @@ class Sudoku:
                     return False
                 
         return True  
-    
-    
+
 
     def generate_sub_puzzles(self):
         """Divide the Sudoku puzzle into 3x3 sub-puzzles."""
@@ -210,7 +230,6 @@ class Sudoku:
 
         return sub_puzzles
     
-
 
     def is_valid_sub_puzzle(self, sub_puzzle):
         """Check if the current sub-puzzle configuration is valid."""
@@ -262,24 +281,51 @@ class Sudoku:
         
         return False
     
-    def combine_sub_puzzles(self, sub_puzzles):
-        """Combine the 3x3 sub-puzzles into a 9x9 Sudoku puzzle."""
-        sudoku = [[0 for _ in range(9)] for _ in range(9)]
-
-        for i, sub_puzzle in enumerate(sub_puzzles):
-            row = (i // 3) * 3
-            col = (i % 3) * 3
-
-            for r in range(3):
-                for c in range(3):
-                    sudoku[row + r][col + c] = sub_puzzle[r][c]
+    def combine_sub_lines(self, sub_lines):
+        """Combine the 3x9 sub_lines-puzzles into a 9x9 Sudoku puzzle."""
+        sudoku = []
+        for lines in sub_lines:
+            sudoku + lines
 
         return sudoku
+    
+
+    def combine_sub_in_lines(self, sub1, sub2, sub3):
+        """given a list of subpuzzles 3x3 in lines and return a list of all possible lines """
+        posssible_list = []
+        for puzzle1 in sub1:
+            for puzzle2 in sub2:
+                for puzzle3 in sub3:
+
+                    row = []
+                    for i in range(3):
+                        value =puzzle1[i] + puzzle2[i] + puzzle3[i]
+                        row.append(value)
+
+                    posssible_list.append(row)
+        return posssible_list
+    
+
+    def validate_line(self, line):
+        self.grid = []
+        self.grid + line
+        self.checkx9()
+
+
+    def generate_puzzles(self, qu1, qu2, qu3):
+        """generate all possibles puzzles given all possible values for 3x9 """
+        puzzles = []
+        for line in qu1:
+            for line2 in qu2:
+                for line3 in qu3:
+                    puzzle = line + line2 + line3
+                    puzzles.append(puzzle)
+        return puzzles
 
 
 if __name__ == "__main__":
     sudoku = Sudoku(
- [  [4, 2, 6, 5, 7, 1, 8, 9, 0], 
+    [[4, 2, 6, 5, 7, 1, 8, 9, 0], 
     [1, 9, 8, 4, 0, 3, 7, 5, 6], 
     [3, 5, 7, 8, 9, 6, 2, 1, 0], 
     [9, 6, 2, 3, 4, 8, 1, 7, 5], 
@@ -290,11 +336,32 @@ if __name__ == "__main__":
     [2, 3, 4, 9, 6, 7, 5, 8, 1]]
     )
 
-    print(sudoku)
+    # print(sudoku)
 
-    if sudoku.check():
-        print("Sudoku is correct!")
-    else:
-        print("Sudoku is incorrect! Please check your solution.")
+    # if sudoku.check():
+    #     print("Sudoku is correct!")
+    # else:
+    #     print("Sudoku is incorrect! Please check your solution.")
+
+    print(sudoku.checkx9())
+
+    # combine the 3x3 sub-puzzles into a 9x9 Sudoku puzzle
+    # sub_puzzles = sudoku.generate_sub_puzzles()
+    # print("sub_puzzles", len(sub_puzzles))
+    # for sub_puzzle in sub_puzzles:
+    #     print(sub_puzzle)
+    # sudoku_new = sudoku.combine_sub_puzzles(sub_puzzles)
+    # print('new___-')
+    # sudoku = Sudoku(sudoku_new)
+    # print(sudoku)
+
+    # print("combine lines: ")
+    # sub1 = [[[4, 6, 8], [5, 7, 9], [1, 3, 2]], [[6, 4, 8], [5, 7, 9], [1, 3, 2]]]
+    # sub2 = [[[9, 3, 5], [1, 2, 8], [7, 6, 4]]]
+    # sub3 = [[[7, 2, 1], [4, 5, 3], [8, 9, 6]], [[7, 2, 1], [4, 6, 3], [8, 9, 5]], [[7, 5, 1], [4, 2, 3], [8, 9, 6]]]
+    # listas = sudoku.combine_sub_in_lines(sub1, sub2, sub3)
+    # print(len(listas))
+    # for lista in listas:
+    #     print(lista,"\n")
 
 
