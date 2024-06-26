@@ -6,6 +6,7 @@ Tasks:
     - [x] dividir o puzzle e receber as configurações
     - [x] reduzir as soluções criando 3x9 válidos
     - [x] reduzir a solução final
+    - [] rever a monitorização do broker
 
 
 references: 

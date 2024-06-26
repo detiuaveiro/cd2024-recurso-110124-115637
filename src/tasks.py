@@ -10,7 +10,11 @@ logger.info("Tasks module loaded")
 @app.task(name="tasks.generate_possible_puzzles")
 def generate_possible_puzzles(task):
     """Generates all possible puzzles for a 3x3 subgrid"""
-    subgrid = task
+    subgrid = task["subgrid"]
+    id = task["id"]
+    logger.info(f"Gera sub-puzzles para {id} : {subgrid}")
+    print(f"Gera sub-puzzles para {id} : {subgrid}")
+
     possible_puzzles = []
     
     sudoku = Sudoku()
@@ -22,7 +26,11 @@ def generate_possible_puzzles(task):
 @app.task(name="tasks.validate_line")
 def validate_line(task):
     """Validates a 3x9 line of a sudoku puzzle"""
-    line = task
+    line = task["lines"]
+    id = task["id"]
+    logger.info(f"Validando linha {id} : {line}")
+    print(f"Validando linha {id} : {line}")
+
     sudoku = Sudoku(line)
     
     if sudoku.checkx9():
@@ -34,7 +42,11 @@ def validate_line(task):
 @app.task(name="tasks.check_puzzle")
 def check_puzzle(task):
     """Checks a 9x9 sudoku puzzle"""
-    puzzle = task
+    puzzle = task["puzzle"]
+    id = task["id"]
+    logger.info(f"Validando puzzle {id} : {puzzle}")
+    print(f"Validando puzzle {id} : {puzzle}")
+    
     sudoku = Sudoku(puzzle)
     
     if sudoku.check():

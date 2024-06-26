@@ -22,16 +22,47 @@ with app.app_context():
 
 pool = ThreadPoolExecutor(10)
 
+def puzzle_to_string(puzzle):
+    """Convert a puzzle to a string"""
+    return json.dumps(puzzle)
+
+def get_cached_result(puzzle):
+    """Get the cached result for a puzzle"""
+    result = r.get(puzzle_to_string(puzzle))
+
+    if result:
+        return json.loads(result)
+    return None
+
 def handle_puzzle(puzzle: list[list[int]], id:str):
+    print("puzzle", puzzle)
+
+    # check if puzzle is in cache
+    result = get_cached_result(puzzle)
+    if result:
+        # save_result(id, result)
+        r.set(id, json.dumps(result))
+
+        # increment solved
+        r.incr("solved")
+        
+        print("Returned cached result")
+        return
+
     sudoku = Sudoku(puzzle)
+
+    print("Solving puzzle", id)
 
     # Gerar sub-puzzles
     sub_puzzles =sudoku.generate_sub_puzzles()
-    print("sub_puzzles", len(sub_puzzles))
+    # print("sub_puzzles", len(sub_puzzles))
 
     # Enviar para o broker
-    task = [generate_possible_puzzles.delay(subgrid) for subgrid in sub_puzzles]
-    print("task", task)
+    task = [generate_possible_puzzles.delay({
+        "subgrid": subgrid, "id": id})
+        for subgrid in sub_puzzles]
+    
+    # print("task", task)
 
     # Esperar que todas as tarefas terminem e juntar os resultados
     results = [t.get() for t in task]
@@ -61,6 +92,7 @@ def handle_puzzle(puzzle: list[list[int]], id:str):
     print("lines3x9", len(line1_results))
     for lines in line1_results:
             print("line", lines)
+            lines = {"lines": lines, "id": id}
             task.append(validate_line.delay(lines))    
 
     results = [t.get() for t in task]
@@ -76,6 +108,7 @@ def handle_puzzle(puzzle: list[list[int]], id:str):
     print("lines3x9 - 2", len(line2_results))
     for lines in line2_results:
             print("line", lines)
+            lines = {"lines": lines, "id": id}
             task.append(validate_line.delay(lines))
 
     results = [t.get() for t in task]
@@ -91,6 +124,7 @@ def handle_puzzle(puzzle: list[list[int]], id:str):
     print("lines3x9 - 3", len(line3_results))
     for lines in line3_results:
             print("line", lines)
+            lines = {"lines": lines, "id": id}
             task.append(validate_line.delay(lines))
 
     results = [t.get() for t in task]
@@ -107,7 +141,9 @@ def handle_puzzle(puzzle: list[list[int]], id:str):
     # combinar e gerar puzzles
     puzzles = sudoku.generate_puzzles(quadrant1, quadrant2, quadrant3)
     print("puzzles", len(puzzles))
-    task = [check_puzzle.delay(puzzle) for puzzle in puzzles]
+    task = [check_puzzle.delay(
+        {"puzzle": puzzle, "id": id})
+        for puzzle in puzzles]
 
     results = [t.get() for t in task if t.get()]
     print("results")
@@ -115,19 +151,25 @@ def handle_puzzle(puzzle: list[list[int]], id:str):
     sudoku = Sudoku(result)
     print(sudoku)
 
-    # cache_result(id, result)
+    # save_result(id, result)
     r.set(id, json.dumps(result))
 
     # increment solved
     r.incr("solved")
 
+    # cache_result(id, result)
+    r.set(puzzle_to_string(puzzle), puzzle_to_string(result))
+
+
 
 def generate_puzzle_id():
+    """Generate a unique id for the puzzle"""
     # return str(hash(tuple(map(tuple, puzzle))))
     return str(uuid.uuid4())
 
 @app.route('/solve', methods=['POST'])
 def solve_puzzle():
+    """Solve a sudoku puzzle"""
     data = request.get_json()
     puzzle = data.get('sudoku')
     
@@ -142,11 +184,12 @@ def solve_puzzle():
 
 @app.route('/solution/<puzzle_id>', methods=['GET'])
 def get_solution(puzzle_id):
+    """Get the solution to a puzzle"""
     # result = get_cached_result(puzzle_id)
     result = r.get(puzzle_id)
     if result:
         return jsonify(json.loads(result))
-    
+    print('result: ', result)
     solved = r.get("solved")
     return solved 
 
