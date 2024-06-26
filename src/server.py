@@ -34,8 +34,22 @@ def get_cached_result(puzzle):
         return json.loads(result)
     return None
 
+def validate_quadrant(line_results, id, quadrant_number):
+    print(f"lines3x9 - {quadrant_number}", len(line_results))
+    tasks = [validate_line.delay({"lines": lines, "id": id}) for lines in line_results]
+    results = [t.get() for t in tasks]
+    
+    print(f"results - {quadrant_number}")
+    valid_results = []
+    for n, result in enumerate(results, 1):
+        print(f'result {n}: {result}')
+        if result:
+            valid_results.append(result)
+    
+    return valid_results
+
 def handle_puzzle(puzzle: list[list[int]], id:str):
-    print("puzzle", puzzle)
+    print(f"Received puzzle {puzzle}, id {id}")
 
     # check if puzzle is in cache
     result = get_cached_result(puzzle)
@@ -66,14 +80,14 @@ def handle_puzzle(puzzle: list[list[int]], id:str):
 
     # Esperar que todas as tarefas terminem e juntar os resultados
     results = [t.get() for t in task]
-    print("results")
-    for n, result in enumerate(results, 1):
-        print(f'result {n}: {result}')
+    # print("results")
+    # for n, result in enumerate(results, 1):
+    #     print(f'result {n}: {result}')
 
     # combinar e gerar linhas
-    print("linha 1: ", results[0], results[1], results[2])
-    print("linha 2: ", results[3], results[4], results[5])
-    print("linha 3: ", results[6], results[7], results[8])
+    # print("linha 1: ", results[0], results[1], results[2])
+    # print("linha 2: ", results[3], results[4], results[5])
+    # print("linha 3: ", results[6], results[7], results[8])
 
     line1 =  results[0], results[1], results[2]
     line2 =  results[3], results[4], results[5]
@@ -86,53 +100,58 @@ def handle_puzzle(puzzle: list[list[int]], id:str):
     line3_results = sudoku.combine_sub_in_lines(line3[0], line3[1], line3[2])
     # print("line3_results", len(line3_results), line3_results)
 
-    # send first 3x9 for validations
-    quadrant1 = []
-    task = []
-    print("lines3x9", len(line1_results))
-    for lines in line1_results:
-            print("line", lines)
-            lines = {"lines": lines, "id": id}
-            task.append(validate_line.delay(lines))    
+    # # send first 3x9 for validations
+    # quadrant1 = []
+    # task = []
+    # print("lines3x9", len(line1_results))
+    # for lines in line1_results:
+    #         print("line", lines)
+    #         lines = {"lines": lines, "id": id}
+    #         task.append(validate_line.delay(lines))    
 
-    results = [t.get() for t in task]
-    print("results")
-    for n, result in enumerate(results, 1):
-        print(f'result {n}: {result}')
-        if result:
-            quadrant1.append(result)
+    # results = [t.get() for t in task]
+    # print("results")
+    # for n, result in enumerate(results, 1):
+    #     print(f'result {n}: {result}')
+    #     if result:
+    #         quadrant1.append(result)
 
-    # send second 3x9 for validations
-    quadrant2 = []
-    task = []
-    print("lines3x9 - 2", len(line2_results))
-    for lines in line2_results:
-            print("line", lines)
-            lines = {"lines": lines, "id": id}
-            task.append(validate_line.delay(lines))
+    # # send second 3x9 for validations
+    # quadrant2 = []
+    # task = []
+    # print("lines3x9 - 2", len(line2_results))
+    # for lines in line2_results:
+    #         print("line", lines)
+    #         lines = {"lines": lines, "id": id}
+    #         task.append(validate_line.delay(lines))
 
-    results = [t.get() for t in task]
-    print("results - 2")
-    for n, result in enumerate(results, 1):
-        print(f'result {n}: {result}')
-        if result:
-            quadrant2.append(result)
+    # results = [t.get() for t in task]
+    # print("results - 2")
+    # for n, result in enumerate(results, 1):
+    #     print(f'result {n}: {result}')
+    #     if result:
+    #         quadrant2.append(result)
 
-    # send third 3x9 for validations
-    quadrant3 = []
-    task = []
-    print("lines3x9 - 3", len(line3_results))
-    for lines in line3_results:
-            print("line", lines)
-            lines = {"lines": lines, "id": id}
-            task.append(validate_line.delay(lines))
+    # # send third 3x9 for validations
+    # quadrant3 = []
+    # task = []
+    # print("lines3x9 - 3", len(line3_results))
+    # for lines in line3_results:
+    #         print("line", lines)
+    #         lines = {"lines": lines, "id": id}
+    #         task.append(validate_line.delay(lines))
 
-    results = [t.get() for t in task]
-    print("results - 3")
-    for n, result in enumerate(results, 1):
-        print(f'result {n}: {result}') 
-        if result:
-            quadrant3.append(result) 
+    # results = [t.get() for t in task]
+    # print("results - 3")
+    # for n, result in enumerate(results, 1):
+    #     print(f'result {n}: {result}') 
+    #     if result:
+    #         quadrant3.append(result) 
+
+    # Validar os três quadrantes
+    quadrant1 = validate_quadrant(line1_results, id, 1)
+    quadrant2 = validate_quadrant(line2_results, id, 2)
+    quadrant3 = validate_quadrant(line3_results, id, 3)
 
     print("quadrant1", len(quadrant1), quadrant1)
     print("quadrant2", len(quadrant2), quadrant2)
