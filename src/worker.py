@@ -1,5 +1,5 @@
 import argparse
-from tasks import app, generate_possible_puzzles
+from tasks import app
 
 def main(broker_address):
     app.conf.update(broker=f"pyamqp://{broker_address}")

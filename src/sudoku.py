@@ -10,7 +10,7 @@ class Sudoku:
         self.grid = sudoku
         self.recent_requests = deque()
         self.check_count = 0
-        self.base_delay = base_delay
+        self.base_delay = base_delay * 0.01
         self.interval = interval
         self.threshold = threshold
 

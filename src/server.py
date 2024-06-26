@@ -35,16 +35,12 @@ def get_cached_result(puzzle):
     return None
 
 def validate_quadrant(line_results, id, quadrant_number):
-    print(f"lines3x9 - {quadrant_number}", len(line_results))
+    """Validate a 3x9 quadrant of a sudoku puzzle"""
+    print(f"Validating quadrant {quadrant_number} for {id}")
     tasks = [validate_line.delay({"lines": lines, "id": id}) for lines in line_results]
     results = [t.get() for t in tasks]
     
-    print(f"results - {quadrant_number}")
-    valid_results = []
-    for n, result in enumerate(results, 1):
-        print(f'result {n}: {result}')
-        if result:
-            valid_results.append(result)
+    valid_results = [result for result in results if result]
     
     return valid_results
 
@@ -85,9 +81,6 @@ def handle_puzzle(puzzle: list[list[int]], id:str):
     #     print(f'result {n}: {result}')
 
     # combinar e gerar linhas
-    # print("linha 1: ", results[0], results[1], results[2])
-    # print("linha 2: ", results[3], results[4], results[5])
-    # print("linha 3: ", results[6], results[7], results[8])
 
     line1 =  results[0], results[1], results[2]
     line2 =  results[3], results[4], results[5]
@@ -100,72 +93,26 @@ def handle_puzzle(puzzle: list[list[int]], id:str):
     line3_results = sudoku.combine_sub_in_lines(line3[0], line3[1], line3[2])
     # print("line3_results", len(line3_results), line3_results)
 
-    # # send first 3x9 for validations
-    # quadrant1 = []
-    # task = []
-    # print("lines3x9", len(line1_results))
-    # for lines in line1_results:
-    #         print("line", lines)
-    #         lines = {"lines": lines, "id": id}
-    #         task.append(validate_line.delay(lines))    
-
-    # results = [t.get() for t in task]
-    # print("results")
-    # for n, result in enumerate(results, 1):
-    #     print(f'result {n}: {result}')
-    #     if result:
-    #         quadrant1.append(result)
+    
+    # Validar os três quadrantes
+    # #  send first 3x9 for validations
+    quadrant1 = validate_quadrant(line1_results, id, 1)
 
     # # send second 3x9 for validations
-    # quadrant2 = []
-    # task = []
-    # print("lines3x9 - 2", len(line2_results))
-    # for lines in line2_results:
-    #         print("line", lines)
-    #         lines = {"lines": lines, "id": id}
-    #         task.append(validate_line.delay(lines))
-
-    # results = [t.get() for t in task]
-    # print("results - 2")
-    # for n, result in enumerate(results, 1):
-    #     print(f'result {n}: {result}')
-    #     if result:
-    #         quadrant2.append(result)
+    quadrant2 = validate_quadrant(line2_results, id, 2)
 
     # # send third 3x9 for validations
-    # quadrant3 = []
-    # task = []
-    # print("lines3x9 - 3", len(line3_results))
-    # for lines in line3_results:
-    #         print("line", lines)
-    #         lines = {"lines": lines, "id": id}
-    #         task.append(validate_line.delay(lines))
-
-    # results = [t.get() for t in task]
-    # print("results - 3")
-    # for n, result in enumerate(results, 1):
-    #     print(f'result {n}: {result}') 
-    #     if result:
-    #         quadrant3.append(result) 
-
-    # Validar os três quadrantes
-    quadrant1 = validate_quadrant(line1_results, id, 1)
-    quadrant2 = validate_quadrant(line2_results, id, 2)
     quadrant3 = validate_quadrant(line3_results, id, 3)
 
-    print("quadrant1", len(quadrant1), quadrant1)
-    print("quadrant2", len(quadrant2), quadrant2)
-    print("quadrant3", len(quadrant3), quadrant3)
 
     # combinar e gerar puzzles
     puzzles = sudoku.generate_puzzles(quadrant1, quadrant2, quadrant3)
-    print("puzzles", len(puzzles))
+    print("Generated ",len(puzzles), "puzzles for ", id)
     task = [check_puzzle.delay(
         {"puzzle": puzzle, "id": id})
         for puzzle in puzzles]
 
     results = [t.get() for t in task if t.get()]
-    print("results")
     result = results[0]
     sudoku = Sudoku(result)
     print(sudoku)
@@ -220,9 +167,11 @@ def page_not_found(e):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Sudoku Solver Master Server')
     parser.add_argument("-p", "--port", type=int, help='Port to run the server on', default=8001)
-    parser.add_argument("-d", "--handicap", type=bool, help='Handicap', default=1)
+    parser.add_argument("-d", "--handicap", type=int, help='Handicap', default=1)
     args = parser.parse_args()
     http_port = args.port
     handicap = args.handicap
+    
+    r.set("handicap", handicap)
 
     app.run(port=http_port)

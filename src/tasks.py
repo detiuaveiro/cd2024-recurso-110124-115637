@@ -1,7 +1,11 @@
 from _celery import app
 from sudoku import Sudoku
 import logging
+import redis
 
+r = redis.Redis(host='localhost', port=6379, db=0)
+
+handicap = int(r.get("handicap") or 1)
 
 logging.basicConfig(level=logging.INFO, filename="tasks.log")
 logger = logging.getLogger(__name__)
@@ -31,7 +35,7 @@ def validate_line(task):
     logger.info(f"Validando linha {id} : {line}")
     print(f"Validando linha {id} : {line}")
 
-    sudoku = Sudoku(line)
+    sudoku = Sudoku(line, base_delay=handicap)
     
     if sudoku.checkx9():
         return line
@@ -47,7 +51,7 @@ def check_puzzle(task):
     logger.info(f"Validando puzzle {id} : {puzzle}")
     print(f"Validando puzzle {id} : {puzzle}")
     
-    sudoku = Sudoku(puzzle)
+    sudoku = Sudoku(puzzle, base_delay=handicap)
     
     if sudoku.check():
         return puzzle
