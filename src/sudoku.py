@@ -10,7 +10,7 @@ class Sudoku:
         self.grid = sudoku
         self.recent_requests = deque()
         self.check_count = 0
-        self.base_delay = base_delay * 0.01
+        self.base_delay = base_delay * 0.001
         self.interval = interval
         self.threshold = threshold
 
@@ -259,6 +259,45 @@ class Sudoku:
                 possibilities.append(new_sub_puzzle)
 
         return possibilities
+    
+
+    # def generate_possibilities(self, sub_puzzle):
+    #     """Generate all valid configurations for a 3x3 sub-puzzle using backtracking."""
+    #     def is_valid_position(num, row, col):
+    #         # Check the row
+    #         if num in sub_puzzle[row] or num in [sub_puzzle[r][col] for r in range(3)]:
+    #             return False
+    #         # Check the column
+    #         # for r in range(3):
+    #         #     if sub_puzzle[r][col] == num:
+    #         #         return False
+    #         # Check the box
+    #         start_row, start_col = row - row % 3, col - col % 3
+    #         for r in range(3):
+    #             for c in range(3):
+    #                 if sub_puzzle[r + start_row][c + start_col] == num:
+    #                     return False
+    #         return True
+
+    #     def solve(position=0):
+    #         if position == 9:  # All positions filled
+    #             solutions.append([row[:] for row in sub_puzzle])  # Deep copy of the solution
+    #             return
+
+    #         row, col = divmod(position, 3)
+    #         if sub_puzzle[row][col]!= 0:  # Skip filled cells
+    #             solve(position + 1)
+    #             return
+
+    #         for num in range(1, 10):  # Try numbers 1-9
+    #             if is_valid_position(num, row, col):
+    #                 sub_puzzle[row][col] = num  # Place the number
+    #                 solve(position + 1)  # Recurse
+    #                 sub_puzzle[row][col] = 0  # Undo the placement for backtracking
+
+    #     solutions = []  
+    #     solve()  
+    #     return solutions
 
 
     def solve_sudoku(self):
@@ -269,7 +308,7 @@ class Sudoku:
 
 
         for guess in range(1, 10):  # posteriormente, mudar para possible_numbers    
-  
+
             if row is not None and col is not None:
                 if self.check_is_valid(row, col, guess):
                     self.grid[row][col] = guess 
@@ -364,4 +403,11 @@ if __name__ == "__main__":
     # for lista in listas:
     #     print(lista,"\n")
 
+    # sub = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+    # print(sudoku.generate_possibilities(sub))
 
+
+
+# sub_puzzle = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]#[[6, 4, 8], [5, 7, 9], [0, 0, 0]]
+# possibilities = Sudoku().generate_possibilities(sub_puzzle)
+# print(len(possibilities), possibilities)
