@@ -236,68 +236,44 @@ class Sudoku:
         # Check if the current sub-puzzle configuration is valid
         nums = [num for row in sub_puzzle for num in row if num != 0]
         return len(nums) == len(set(nums))
-
-    def generate_possibilities(self, sub_puzzle):
-        """Generate all possible configurations for a 3x3 sub-puzzle."""
-        # Find all empty positions
-        empty_positions = [(i, j) for i in range(3) for j in range(3) if sub_puzzle[i][j] == 0]
-
-        # Generate all combinations of numbers 1-9 for the empty positions
-        all_numbers = [num for num in range(1, 10)]
-        existing_numbers = {num for row in sub_puzzle for num in row if num != 0}
-        possible_numbers = [num for num in all_numbers if num not in existing_numbers]
-
-        possibilities = []
-
-        for combination in itertools.product(possible_numbers, repeat=len(empty_positions)):
-            new_sub_puzzle = [row[:] for row in sub_puzzle]  # Copy the sub-puzzle
-
-            for (i, j), num in zip(empty_positions, combination):
-                new_sub_puzzle[i][j] = num
-
-            if self.is_valid_sub_puzzle(new_sub_puzzle):
-                possibilities.append(new_sub_puzzle)
-
-        return possibilities
     
+    def generate_possibilities(self, sub_puzzle):
+        """Generate all valid configurations for a 3x3 sub-puzzle using backtracking."""
+        def is_valid_position(num, row, col):
+            # Check the row
+            if num in sub_puzzle[row] or num in [sub_puzzle[r][col] for r in range(3)]:
+                return False
+            # Check the column
+            # for r in range(3):
+            #     if sub_puzzle[r][col] == num:
+            #         return False
+            # Check the box
+            start_row, start_col = row - row % 3, col - col % 3
+            for r in range(3):
+                for c in range(3):
+                    if sub_puzzle[r + start_row][c + start_col] == num:
+                        return False
+            return True
 
-    # def generate_possibilities(self, sub_puzzle):
-    #     """Generate all valid configurations for a 3x3 sub-puzzle using backtracking."""
-    #     def is_valid_position(num, row, col):
-    #         # Check the row
-    #         if num in sub_puzzle[row] or num in [sub_puzzle[r][col] for r in range(3)]:
-    #             return False
-    #         # Check the column
-    #         # for r in range(3):
-    #         #     if sub_puzzle[r][col] == num:
-    #         #         return False
-    #         # Check the box
-    #         start_row, start_col = row - row % 3, col - col % 3
-    #         for r in range(3):
-    #             for c in range(3):
-    #                 if sub_puzzle[r + start_row][c + start_col] == num:
-    #                     return False
-    #         return True
+        def solve(position=0):
+            if position == 9:  # All positions filled
+                solutions.append([row[:] for row in sub_puzzle])  # Deep copy of the solution
+                return
 
-    #     def solve(position=0):
-    #         if position == 9:  # All positions filled
-    #             solutions.append([row[:] for row in sub_puzzle])  # Deep copy of the solution
-    #             return
+            row, col = divmod(position, 3)
+            if sub_puzzle[row][col]!= 0:  # Skip filled cells
+                solve(position + 1)
+                return
 
-    #         row, col = divmod(position, 3)
-    #         if sub_puzzle[row][col]!= 0:  # Skip filled cells
-    #             solve(position + 1)
-    #             return
+            for num in range(1, 10):  # Try numbers 1-9
+                if is_valid_position(num, row, col):
+                    sub_puzzle[row][col] = num  # Place the number
+                    solve(position + 1)  # Recurse
+                    sub_puzzle[row][col] = 0  # Undo the placement for backtracking
 
-    #         for num in range(1, 10):  # Try numbers 1-9
-    #             if is_valid_position(num, row, col):
-    #                 sub_puzzle[row][col] = num  # Place the number
-    #                 solve(position + 1)  # Recurse
-    #                 sub_puzzle[row][col] = 0  # Undo the placement for backtracking
-
-    #     solutions = []  
-    #     solve()  
-    #     return solutions
+        solutions = []  
+        solve()  
+        return solutions
 
 
     def solve_sudoku(self):
