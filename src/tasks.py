@@ -11,26 +11,24 @@ logging.basicConfig(level=logging.INFO, filename="tasks.log")
 logger = logging.getLogger(__name__)
 logger.info("Tasks module loaded")
 
-@app.task(name="tasks.generate_possible_puzzles", bind=True)
-def generate_possible_puzzles(self, task):
-    try:
-        """Generates all possible puzzles for a 3x3 subgrid"""
-        subgrid = task["subgrid"]
-        id = task["id"]
-        logger.info(f"Gera sub-puzzles para {id} : {subgrid}")
-        print(f"Print Gera sub-puzzles para {id} : {subgrid}")
+@app.task(name="tasks.generate_possible_puzzles")
+def generate_possible_puzzles(task):
+    
+    """Generates all possible puzzles for a 3x3 subgrid"""
+    subgrid = task["subgrid"]
+    id = task["id"]
+    logger.info(f"Gera sub-puzzles para {id} : {subgrid}")
+    print(f"Print Gera sub-puzzles para {id} : {subgrid}")
 
-        possible_puzzles = []
-        
-        sudoku = Sudoku()
-        possible_puzzles = sudoku.generate_possibilities(subgrid)
-        print("possible_puzzles", possible_puzzles)
-        return possible_puzzles
-    except Exception as e:
-        self.retry(exc=e, countdown=5, max_retries=3)  
+    possible_puzzles = []
+    
+    sudoku = Sudoku()
+    possible_puzzles = sudoku.generate_possibilities(subgrid)
+    print("possible_puzzles", possible_puzzles)
+    return possible_puzzles
 
 
-@app.task(name="tasks.validate_line", bind=True)
+@app.task(name="tasks.validate_line")
 def validate_line(task):
     """Validates a 3x9 line of a sudoku puzzle"""
     line = task["lines"]
@@ -46,7 +44,7 @@ def validate_line(task):
         return False
     
 
-@app.task(name="tasks.check_puzzle", bind=True)
+@app.task(name="tasks.check_puzzle")
 def check_puzzle(task):
     """Checks a 9x9 sudoku puzzle"""
     puzzle = task["puzzle"]
