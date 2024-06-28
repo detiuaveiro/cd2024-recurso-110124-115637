@@ -15,3 +15,7 @@ references:
 - https://youtu.be/cvhKoniK5Uo?si=6wA8mHonWGvFqmJ8
 - https://youtu.be/aReuLtY0YMI?si=zCV-N8mXoh2NhFat
 - https://youtu.be/aReuLtY0YMI?si=5m1GboSwLTa4kpCP
+
+Celery: 
+    - https://medium.com/featurepreneur/flower-celery-monitoring-tool-50fba1c8f623
+    - https://flower.readthedocs.io/en/latest/install.html
