@@ -1,3 +1,4 @@
 Flask
 Celery
 redis
+flower

@@ -13,11 +13,12 @@ logger.info("Tasks module loaded")
 
 @app.task(name="tasks.generate_possible_puzzles")
 def generate_possible_puzzles(task):
+    
     """Generates all possible puzzles for a 3x3 subgrid"""
     subgrid = task["subgrid"]
     id = task["id"]
     logger.info(f"Gera sub-puzzles para {id} : {subgrid}")
-    print(f"Gera sub-puzzles para {id} : {subgrid}")
+    print(f"Print Gera sub-puzzles para {id} : {subgrid}")
 
     possible_puzzles = []
     
