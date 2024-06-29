@@ -1,9 +1,17 @@
 from _celery import app
 from sudoku import Sudoku
 import logging
-import redis
+import redis, json
+import os
+from dotenv import load_dotenv
 
-r = redis.Redis(host='localhost', port=6379, db=0)
+# start redis
+load_dotenv()
+REDIS_HOST = os.getenv("REDIS_HOST")
+if not REDIS_HOST:
+    REDIS_HOST = 'localhost'
+
+r = redis.Redis(host=REDIS_HOST, port=6379, db=1)
 
 handicap = int(r.get("handicap") or 1)
 
@@ -17,14 +25,27 @@ def generate_possible_puzzles(task):
     """Generates all possible puzzles for a 3x3 subgrid"""
     subgrid = task["subgrid"]
     id = task["id"]
+
+    # ver se já gerei esse subgrid antes
+    key = json.dumps(subgrid)
+    if r.exists(key):
+        value = r.get(key)
+        return json.loads(value)
+
+
     logger.info(f"Gera sub-puzzles para {id} : {subgrid}")
-    print(f"Print Gera sub-puzzles para {id} : {subgrid}")
+    print(f"Gera sub-puzzles para {id} : {subgrid}")
 
     possible_puzzles = []
     
     sudoku = Sudoku()
     possible_puzzles = sudoku.generate_possibilities(subgrid)
     print("possible_puzzles", possible_puzzles)
+
+    # guardar na cachez
+    value_to_cache = json.dumps(possible_puzzles)
+    r.set(key, value_to_cache)
+    
     return possible_puzzles
 
 
