@@ -6,11 +6,18 @@ import json, uuid
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 
+import os
+from dotenv import load_dotenv
 import redis
 
 app = Flask(__name__)
 # start redis
-r = redis.Redis(host='localhost', port=6379, db=0)
+load_dotenv()
+REDIS_HOST = os.getenv("REDIS_HOST")
+if not REDIS_HOST:
+    REDIS_HOST = 'localhost'
+
+r = redis.Redis(host=REDIS_HOST, port=6379, db=1)
 
 # push context manually to app
 with app.app_context():
