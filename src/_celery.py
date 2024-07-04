@@ -18,6 +18,13 @@ app.conf.update(
     worker_autoscale='5,1', # min 4 workers, max 1 worker
     task_reject_on_worker_lost=True, # reject task if worker is lost, so it can be retried by another worker
 
+    # broker settings
+    broker_connetion_retry=True,
+    broker_connection_max_retries=10, # or None 
+    broker_connection_retry_interval_start=2,  
+    broker_connection_retry_interval_step=2,  
+    broker_connection_retry_interval_max=30,  
+
 )
 
 
