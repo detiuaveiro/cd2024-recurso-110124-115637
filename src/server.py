@@ -9,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 import os
 from dotenv import load_dotenv
 import redis
+import time
 
 app = Flask(__name__)
 # start redis
@@ -52,6 +53,7 @@ def validate_quadrant(line_results, id, quadrant_number):
     return valid_results
 
 def handle_puzzle(puzzle: list[list[int]], id:str):
+    start_time = time.time()
     print(f"Received puzzle {puzzle}, id {id}")
 
     # check if puzzle is in cache
@@ -121,6 +123,7 @@ def handle_puzzle(puzzle: list[list[int]], id:str):
 
     results = [t.get() for t in task if t.get()]
     result = results[0]
+    print(f"Solved puzzle {id} in {time.time() - start_time} seconds")
     sudoku = Sudoku(result)
     print(sudoku)
 
