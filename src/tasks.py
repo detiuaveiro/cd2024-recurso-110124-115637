@@ -11,6 +11,8 @@ REDIS_HOST = os.getenv("REDIS_HOST")
 if not REDIS_HOST:
     REDIS_HOST = 'localhost'
 
+print("Task.py REDIS_HOST: ", REDIS_HOST)
+
 r = redis.Redis(host=REDIS_HOST, port=6379, db=1)
 
 handicap = int(r.get("handicap") or 1)
@@ -19,7 +21,7 @@ logging.basicConfig(level=logging.INFO, filename="tasks.log")
 logger = logging.getLogger(__name__)
 logger.info("Tasks module loaded")
 
-@app.task(name="tasks.generate_possible_puzzles")
+@app.task(name="tasks.generate_possible_puzzles", autoretry_for=(Exception,), retry_kwargs={'max_retries': 3})
 def generate_possible_puzzles(task):
     
     """Generates all possible puzzles for a 3x3 subgrid"""
@@ -49,7 +51,7 @@ def generate_possible_puzzles(task):
     return possible_puzzles
 
 
-@app.task(name="tasks.validate_line")
+@app.task(name="tasks.validate_line", autoretry_for=(Exception,), retry_kwargs={'max_retries': 3})
 def validate_line(task):
     """Validates a 3x9 line of a sudoku puzzle"""
     line = task["lines"]
@@ -65,7 +67,7 @@ def validate_line(task):
         return False
     
 
-@app.task(name="tasks.check_puzzle")
+@app.task(name="tasks.check_puzzle", autoretry_for=(Exception,), retry_kwargs={'max_retries': 3})
 def check_puzzle(task):
     """Checks a 9x9 sudoku puzzle"""
     puzzle = task["puzzle"]

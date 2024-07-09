@@ -22,6 +22,7 @@ def main(broker_address, worker_name, concurrency=None, autoscale=None):
     if autoscale:
         argv.extend(["--autoscale", autoscale ])
 
+    print(f"Broker and redis set to {app.conf.broker}")
 
     app.start(argv)
 

@@ -1,7 +1,15 @@
 from celery import Celery
 
+
+broker_urls = [
+    'amqp://guest:guest@localhost:5672//',
+    'amqp://guest:guest@localhost:5673//',
+    'amqp://guest:guest@localhost:5674//',
+    'amqp://guest@localhost//',  # default
+]
+
 app = Celery('sudoku_solver',
-            broker='pyamqp://guest@localhost//',
+            broker=broker_urls,
             backend='redis://localhost:6379/0',
             include=['tasks'])
 
@@ -24,6 +32,9 @@ app.conf.update(
     broker_connection_retry_interval_start=2,  
     broker_connection_retry_interval_step=2,  
     broker_connection_retry_interval_max=30,  
+
+    # workers config
+    worker_cancel_long_running_tasks_on_connection_loss = True,
 
 )
 
