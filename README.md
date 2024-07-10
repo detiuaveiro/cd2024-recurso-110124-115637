@@ -38,23 +38,23 @@ To solve the following sudoku board:
     [1, 5, 8, 6, 9, 7, 0, 2, 3]]
 }
 ```
-    server running on localhost:8000
-        - Send a POST request to `http://localhost:5000/solve` with the sudoku board in the request body.
-        - The server will return the puzzle ID.
-        - Send a GET request to `http://localhost:5000/solution/<puzzle_id>` to check the status of the puzzle. It will return the puzzle if it is solved, or the number of subpuzzles solved if it is still in progress.
-        **post**
-        ![Post request](./readme/postsolve.png)
-        **get a puzzle that isn't solved or is still solving**
-        ![Get unsolved request](./readme/getnotsolved.png)
-        **get a puzzle that is solved**
-        ![Get solved request](./readme/getsolved.png)
+server running on localhost:8000
+    - Send a POST request to `http://localhost:5000/solve` with the sudoku board in the request body.
+    - The server will return the puzzle ID.
+    - Send a GET request to `http://localhost:5000/solution/<puzzle_id>` to check the status of the puzzle. It will return the puzzle if it is solved, or the number of subpuzzles solved if it is still in progress.
+    **post**
+    ![Post request](./readme/postsolve.png)
+    **get a puzzle that isn't solved or is still solving**
+    ![Get unsolved request](./readme/getnotsolved.png)
+    **get a puzzle that is solved**
+    ![Get solved request](./readme/getsolved.png)
 ## Additional Information
-    Server/master:
-        -The server can handle multiple requests at the same time and can solve multiple sudoku puzzles concurrently, once it's multi-threaded.
-        -The server can be initialized with some parameters, such as the port number (-p), and a delay (-d) to simulate a slow the workers check functions, the delay is in miliseconds.
-        example: `python3 server.py -p 5000 -d 5` 
-    Worker:
-        -The worker can be initialized with some parameters, such as the -b parameter to specify the broker URL if they are running on different machines. However you can use the default celery worker command to start the worker.
-        example using worker.py: `python3 worker.py -b 192.168.14.22:5672`
+Server/master:
+    -The server can handle multiple requests at the same time and can solve multiple sudoku puzzles concurrently, once it's multi-threaded.
+    -The server can be initialized with some parameters, such as the port number (-p), and a delay (-d) to simulate a slow the workers check functions, the delay is in miliseconds.
+    example: `python3 server.py -p 5000 -d 5` 
+Worker:
+    -The worker can be initialized with some parameters, such as the -b parameter to specify the broker URL if they are running on different machines. However you can use the default celery worker command to start the worker.
+    example using worker.py: `python3 worker.py -b 192.168.14.22:5672`
 
-    **Note**: There is a half-implemented rabbitmq cluster in the compose file. You can take a look at it if you want to run the project in a cluster environment, and adapt it to your needs.
+**Note**: There is a half-implemented rabbitmq cluster in the compose file. You can take a look at it if you want to run the project in a cluster environment, and adapt it to your needs.
