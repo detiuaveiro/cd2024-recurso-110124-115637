@@ -48,6 +48,8 @@ server running on localhost:8000
     ![Get unsolved request](./readme/getnotsolved.png)
     **get a puzzle that is solved**
     ![Get solved request](./readme/getsolved.png)
+    **server example**
+    ![Server example](./readme/serverexe.png)
 ## Additional Information
 Server/master:
     -The server can handle multiple requests at the same time and can solve multiple sudoku puzzles concurrently, once it's multi-threaded.
