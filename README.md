@@ -8,6 +8,8 @@ The architecture of the project is as follows:
     -**Master**: The master node is responsible for receiving the sudoku board from the client, splitting the board into smaller chunks(3x3 subpuzzles), and sending the chunks to the worker nodes. It also collects the results from the worker nodes and combines them to form 3x9 subpuzzles. And finally, it combines the 3x9 subpuzzles to form the final solved sudoku board.
     -**Worker**: The worker nodes receive the 3x3 subpuzzles from the master node, generate all possible solutions for the subpuzzles, and send the solutions back to the master node. The workers are also responsible for validating the 3x9 subpuzzles received from the master node, and validate the final solved sudoku board.
 
+    ![Architecture](./readme/arch.png)
+
 ## Installation
 To install the project, follow the steps below:
     - Clone the repository
