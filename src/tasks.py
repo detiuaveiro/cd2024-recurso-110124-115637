@@ -11,7 +11,6 @@ REDIS_HOST = os.getenv("REDIS_HOST")
 if not REDIS_HOST:
     REDIS_HOST = 'localhost'
 
-print("Task.py REDIS_HOST: ", REDIS_HOST)
 
 r = redis.Redis(host=REDIS_HOST, port=6379, db=1)
 

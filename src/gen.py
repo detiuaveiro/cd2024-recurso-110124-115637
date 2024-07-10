@@ -61,6 +61,6 @@ if __name__ == "__main__":
     print(new_puzzle)
 
     print(
-        "curl http://localhost:8001/solve -X POST -H 'Content-Type: application/json' -d '{\"sudoku\": %s}'"
+        "curl http://192.168.1.101:8001/solve -X POST -H 'Content-Type: application/json' -d '{\"sudoku\": %s}'"
         % (new_puzzle.grid)
     )
